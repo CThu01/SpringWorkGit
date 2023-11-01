@@ -20,6 +20,8 @@ import com.jdc.cthu.demo.form.ProductEditForm;
 import com.jdc.cthu.demo.form.ProductSearchForm;
 import com.jdc.cthu.demo.output.ProductUploadResult;
 import com.jdc.cthu.demo.output.TextFileReader;
+import com.jdc.cthu.repo.ProductRepo;
+import com.jdc.cthu.service.ImageFileWriter;
 import com.jdc.cthu.service.ProductService;
 
 @RestController
@@ -31,6 +33,12 @@ public class ProductApi{
 	
 	@Autowired
 	TextFileReader textFileReader;
+	
+	@Autowired
+	ImageFileWriter imageFileWriter;
+	
+	@Autowired
+	ProductRepo productRepo;
 
 	@GetMapping
 	public Page<ProductDto> search(
@@ -46,20 +54,22 @@ public class ProductApi{
 	}
 	
 	@PostMapping("upload")
-	public ProductUploadResult upload(@RequestBody MultipartFile file) {
+	public ProductUploadResult upload(@RequestParam MultipartFile file) {
 		var lines = textFileReader.reader(file);
 		var result = productService.create(lines);
 		return result;
 	}
 	
 	@PostMapping("{id}/photos")
-	public Long uploadPhotos(@PathVariable int id,@RequestParam MultipartFile[] file) {
-		return null;
+	public ProductDetailDto uploadPhotos(@PathVariable int id,@RequestParam MultipartFile[] file) {
+		var images = imageFileWriter.save(id, file);
+		productService.uploadPhoto(id,images);
+		
+		return productService.findById(id);
 	}
 	
 	@GetMapping("{id}")
 	public ProductDetailDto findById(@PathVariable int id) {
-		
 		return productService.findById(id);
 	}
 	

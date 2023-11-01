@@ -70,11 +70,6 @@ public class ProductService {
 		
 		return productRepo.findAll(queryFunc, queryCount, page, size);
 	}
-	
-	public List<ProductDto> upload(){
-		
-		return null;
-	}
 
 	
 	public ProductUploadResult create(ProductEditForm form) {
@@ -104,11 +99,20 @@ public class ProductService {
 	
 
 	public ProductDetailDto findById(int id) {
-
-		return productRepo.findById(id).map(ProductDetailDto::new).orElseThrow(() -> new EntityNotFoundException());
+		return productRepo.findById(id).map(ProductDetailDto::new)
+				.orElseThrow(() -> new EntityNotFoundException());
 	}
 
+	@Transactional
+	public void uploadPhoto(int id, List<String> images) {
 
+		var product = productRepo.findById(id).orElseThrow(() -> new EntityNotFoundException());
+		
+		product.getImages().addAll(images);
+		if(!StringUtils.hasLength(product.getImage()) && !product.getImages().isEmpty()) {
+			product.setImage(images.get(0));
+		}	
+	}
 	
 	@Transactional
 	public ProductUploadResult create(List<String> productList) {
@@ -191,6 +195,7 @@ public class ProductService {
 		
 		return categoryName;
 	}
+
 
 	
 	

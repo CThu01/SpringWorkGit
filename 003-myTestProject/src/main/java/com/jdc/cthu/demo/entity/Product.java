@@ -52,6 +52,9 @@ public class Product implements Serializable{
 	
 	private String image;
 	
+	@ElementCollection
+	private List<String> images = new ArrayList<>();
+	
 	@OneToMany(mappedBy = "product")
 	private List<ProductHistory> producthistory;
 	
