@@ -16,7 +16,8 @@ public class ProductDetailDto {
 	private int price;
 	private String description;
 	private Map<String, String> features;
-	private String images;
+	private String image;
+	private List<String> images;
 	private Status status;
 	private List<CategoryDto> category;
 	private List<ProductHistoryDto> productHistory;
@@ -28,7 +29,8 @@ public class ProductDetailDto {
 		this.price = entity.getPrice();
 		this.description = entity.getDescription();
 		this.features = entity.getFeatures();
-		this.images = entity.getImage();
+		this.image = entity.getImage();
+		this.images = entity.getImages();
 		this.category = entity.getCategory().stream().map(CategoryDto::new).toList();
 		this.productHistory = entity.getProducthistory().stream().map(ProductHistoryDto::new).toList();
 	}

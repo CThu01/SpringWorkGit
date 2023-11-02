@@ -1,6 +1,5 @@
 package com.jdc.cthu.service;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -18,15 +17,16 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ImageFileWriter {
 
-	@Value("app.image.folder")
+	@Value("${app.image.folder}")
 	private String imagePath;
-	private List<String> fileNameList = new ArrayList<>();
 	private Logger logger = LoggerFactory.getLogger(ImageFileWriter.class);
 	
 	private static final String fileFormat = "p_%06d_%s_%03d.%s";
 	private static final DateTimeFormatter dFmt = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 	
-	public List<String> save(int id, MultipartFile[] files){
+	public List<String> save(int id, MultipartFile ... files){
+		
+		List<String> fileNameList = new ArrayList<String>();
 		
 		for(int i=0; i<files.length; i++) {
 			
@@ -37,6 +37,7 @@ public class ImageFileWriter {
 			
 				Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
 				fileNameList.add(fileName);
+				
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 				e.printStackTrace();
@@ -48,7 +49,8 @@ public class ImageFileWriter {
 
 	private String getFileName(MultipartFile file,int productId,int id) {
 		var dateTime = LocalDateTime.now().format(dFmt);
-		var extension = file.getName().split("\\.");
+		System.out.println("File Original File Name : %s".formatted(file.getOriginalFilename()));
+		var extension = file.getOriginalFilename().split("\\.");
 		var fileNameResult = fileFormat.formatted(productId,dateTime,id+1,extension[extension.length-1]);
 		return fileNameResult;
 	}
